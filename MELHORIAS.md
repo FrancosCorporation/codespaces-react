@@ -11,6 +11,7 @@
 - Trocada a configuração órfã do CRA por ESLint flat config e adicionados lint/CI de build. Removido o helper `reportWebVitals` e a dependência que não coletava métricas.
 - README e inicialização do Vite apontam para a porta encaminhada pelo Codespaces; a tela inicial agora tem um contador funcional, navegação por teclado e links para os guias.
 - `TEST-01` continua pendente: a CI não executa Vitest nesta rodada. A suíte existente não foi alterada nem executada.
+- CI `7b1411ebdf333f6bc0dcb58b5bff4756ff82f864` publicado em `main`; execução remota concluída com sucesso.
 
 ---
 
@@ -37,7 +38,7 @@ Template Vite+React para Codespaces: `dev/start: vite`, `build: vite build`, `te
 | devcontainer + launch.json | `.devcontainer/devcontainer.json`, `.vscode/launch.json` |
 | build multi-stage com serve | `Dockerfile` |
 
-**O que está quebrado:**
+**Problemas encontrados na análise inicial:**
 
 1. `eslintConfig` apontava para presets CRA ausentes, e o projeto não tinha um comando de lint funcional.
 2. `RUN npm ci || npm install` mascarava falha do lockfile.
@@ -52,7 +53,7 @@ Template Vite+React para Codespaces: `dev/start: vite`, `build: vite build`, `te
 |---|---|---|---|---|
 | DEVOPS-01 | `npm ci || npm install` mascara falha de lockfile | **P1** | `Dockerfile` | — |
 | DOC-01 | eslintConfig `react-app` órfão (CRA não instalado) | **P2** | `package.json` | — |
-| TEST-01 | CI ausente — vitest não roda automaticamente | **P2** | *(ausente)* `.github/workflows/` | — |
+| TEST-01 | CI não executa Vitest automaticamente | **P2** | `.github/workflows/ci.yml` | — |
 | DOC-02 | README — verificar instruções vs Vite real | **P2** | `README.md` | — |
 | IMP-01 | web-vitals/reportWebVitals herança CRA | **P3** | `src/reportWebVitals.js` | — |
 
@@ -149,14 +150,14 @@ Template Vite+React para Codespaces: `dev/start: vite`, `build: vite build`, `te
 1. **`DEVOPS-01`** — `npm ci` puro.
 
 ### Wave 2 — Qualidade (P2)
-2. **`DOC-01`** — eslint de verdade.
-3. **`TEST-01`** — CI com vitest.
-4. **`DOC-02`** — README.
+2. **`DOC-01`** — ESLint funcional (concluído).
+3. **`DOC-02`** — README alinhado ao Vite (concluído).
+4. **`TEST-01`** — incluir Vitest na CI (pendente).
 
 ### Wave 3 — Limpeza (P3)
 5. **`IMP-01`** — herança CRA.
 
-**Dependências:** `TEST-01` depois de `DOC-01` (CI deve rodar o lint novo também).
+**Estado atual:** DEVOPS-01, DOC-01, DOC-02 e IMP-01 concluídos. TEST-01 depende da suíte Vitest existente e ainda não foi implementado na CI.
 
 ---
 
@@ -193,4 +194,4 @@ npm run lint
 
 ---
 
-*Fim do plano. Gerado por leitura direta do código em 2026-10-05. Nenhum item já estava corrigido — todos apontam para defeitos ainda presentes.*
+*Fim do plano. O diagnóstico inicial foi feito em 2026-10-05; o registro de implementação reflete o estado em 2026-10-11.*
