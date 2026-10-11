@@ -1,9 +1,16 @@
 # MELHORIAS — codespaces-react
 
 > **Gerado por análise de código em 2026-10-05** · Stack: Vite + React 18 (template GitHub Codespaces) · test runner: vitest
-> Branch `main` · sem dependências CRA (react-scripts ausente) · devcontainer presente · sem CI
+> Branch `main` · Vite/React · devcontainer presente · CI com lint/build/audit
 >
 > **Este arquivo é um plano de execução.** Cada item tem ID, `arquivo:linha`, mudança exata, critério de aceite e comando de verificação.
+
+## Registro de implementação — 2026-10-11
+
+- Docker agora exige `npm ci`, usa Node 24 e executa a imagem final como usuário sem privilégios; Compose publica a prévia apenas em loopback.
+- Trocada a configuração órfã do CRA por ESLint flat config e adicionados lint/CI de build. Removido o helper `reportWebVitals` e a dependência que não coletava métricas.
+- README e inicialização do Vite apontam para a porta encaminhada pelo Codespaces; a tela inicial agora tem um contador funcional, navegação por teclado e links para os guias.
+- `TEST-01` continua pendente: a CI não executa Vitest nesta rodada. A suíte existente não foi alterada nem executada.
 
 ---
 
@@ -18,7 +25,7 @@
 
 ## 1. Diagnóstico executivo
 
-Template Vite+React para Codespaces: `start: vite`, `build: vite build`, `test: vitest`. `overrides` de segurança presentes, devcontainer documentado.
+Template Vite+React para Codespaces: `dev/start: vite`, `build: vite build`, `test: vitest`. `overrides` de segurança presentes, devcontainer e CI de lint/build configurados; Vitest ainda não faz parte da CI.
 
 **O que está bem (não regredir):**
 
@@ -32,9 +39,10 @@ Template Vite+React para Codespaces: `start: vite`, `build: vite build`, `test: 
 
 **O que está quebrado:**
 
-1. `eslintConfig` ainda aponta `react-app`/`react-app/jest` — extensão CRA que **não está instalada** (herança morta do template).
-2. `RUN npm ci || npm install` mascara falha do `npm ci` (padrão repetido do acervo).
-3. Sem CI — vitest só roda se alguém lembrar.
+1. `eslintConfig` apontava para presets CRA ausentes, e o projeto não tinha um comando de lint funcional.
+2. `RUN npm ci || npm install` mascarava falha do lockfile.
+3. O guia Docker mandava usar Compose, mas não havia arquivo Compose; Vite encaminhava porta diferente da configurada no Codespaces.
+4. A tela do template não tinha o contador descrito no README original.
 
 ---
 
@@ -66,8 +74,9 @@ Template Vite+React para Codespaces: `start: vite`, `build: vite build`, `test: 
 
 ### TEST-01 · vitest sem CI — testes não rodam automaticamente · [P2]
 
-- **Arquivo:** *(ausente)* `.github/workflows/`
-- **Evidência:** `package.json` tem `"test": "vitest"`, `src/App.test.jsx` existe, mas nenhum workflow executa.
+- **Arquivo:** `.github/workflows/ci.yml`
+- **Evidência:** `package.json` tem `"test": "vitest"` e `src/App.test.jsx` existe; o workflow cobre instalação, audit, lint e build, mas não executa Vitest.
+- **Estado:** a CI agora roda instalação limpa, lint e build; Vitest segue pendente.
 - **Impacto:** regressões passam; o script de teste vira decoração (padrão recorrente do acervo).
 - **Mudança:** workflow `on: [push, pull_request]`: `npm ci` → `npm run build` → `npx vitest run`.
 - **Aceite:** PR que quebra o teste é bloqueado.
@@ -85,7 +94,7 @@ Template Vite+React para Codespaces: `start: vite`, `build: vite build`, `test: 
 - **Arquivo:** `Dockerfile` (etapa build)
 - **Evidência:** `RUN npm ci || npm install` — se `package-lock.json` estiver dessincronizado, o `npm ci` falha e o `npm install` **silenciosamente instala outra árvore** (a que o lock dizia para não usar).
 - **Impacto:** builds "verdes" com dependências diferentes das testadas; lockfile perde a função.
-- **Mudança:** remover o fallback: `RUN npm ci`. Se o lock faltar, **falhar** (é o sinal correto).
+- **Mudança:** remover o fallback: `RUN npm ci`.
 - **Aceite:** build falha quando lock está errado; build passa quando está certo.
 - **Verificação:**
   ```bash
@@ -166,19 +175,21 @@ Template Vite+React para Codespaces: `start: vite`, `build: vite build`, `test: 
 ## 10. Definição de pronto (DoD)
 
 **Infra**
-- [ ] `DEVOPS-01` — sem `|| npm install` no Dockerfile
+- [x] `DEVOPS-01` — sem `|| npm install` no Dockerfile
 
 **Qualidade/doc**
-- [ ] `DOC-01` — `npm run lint` roda
+- [x] `DOC-01` — `npm run lint` roda
 - [ ] `TEST-01` — CI com `vitest run`
-- [ ] `DOC-02` — README == comandos reais
-- [ ] `IMP-01` — herança CRA removida ou justificada
+- [x] `DOC-02` — README == comandos reais, incluindo Compose e porta 3000
+- [x] `IMP-01` — helper e dependência CRA removidos
 
 **Validação final:**
 ```bash
 npm ci && npm run build && npx vitest run
 npm run lint
 ```
+
+**Validação realizada em 2026-10-11:** `npm ci`, `npm audit --audit-level=high` (0), `npm run lint`, `npm run build`, `docker compose config --quiet`, Docker build e `git diff --check` passaram. Vitest não foi executado.
 
 ---
 

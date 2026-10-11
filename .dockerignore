@@ -3,5 +3,8 @@ node_modules
 dist
 build
 *.log
-.env
+.env*
+.npmrc
+coverage
+.vite
 npm-debug.log*

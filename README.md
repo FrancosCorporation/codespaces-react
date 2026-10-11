@@ -1,67 +1,53 @@
-# codespaces-react
+# Codespaces React
 
-## 🐳 Instalação e Execução (Docker) — recomendado
+Um ponto de partida pequeno para aprender React e experimentar dentro do GitHub Codespaces. O projeto usa React 18 e Vite; a tela inicial inclui um contador interativo para demonstrar estado e eventos.
 
-### Pré-requisitos
-- [Docker](https://docs.docker.com/get-docker/) + Docker Compose
+## Rodar no GitHub Codespaces
 
-### Rodar com Docker
+Abra o repositório no Codespaces. O Dev Container instala as dependências e encaminha a aplicação pela porta 3000.
+
+## Rodar localmente
+
+Requisitos: Node.js 22.13+ ou 24+ e npm. Node 24 é usado no Docker, no Codespaces e na CI.
+
+```bash
+npm ci
+npm run dev
+```
+
+Abra http://localhost:3000. O servidor também pode ser iniciado com `npm start`.
+
+## Prévia com Docker
+
+O Compose constrói a versão de produção e a serve localmente na porta 3000:
+
 ```bash
 docker compose up --build
 ```
 
+Abra http://localhost:3000. Para usar outra porta local, defina `APP_PORT`, por exemplo `APP_PORT=8080 docker compose up --build`.
 
-### Sem Docker (local)
-```bash
-npm install
-npm start
-```
-
-
-Template oficial de **React + Vite** do GitHub Codespaces, usado como base de
-estudo e ponto de partida para experimentos com React.
-
-![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)
-![Codespaces](https://img.shields.io/badge/GitHub-Codespaces-181717?style=flat-square&logo=github)
-![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
-![Status](https://img.shields.io/badge/status-template-lightgrey?style=flat-square)
-
-## Sobre
-
-Repositório criado a partir do template **GitHub Codespaces React** para
-explorar o ambiente de desenvolvimento na nuvem do GitHub. Contém o app
-inicial do template (contador de cliques) e a configuração de devcontainer
-pronta para uso.
-
-## Funcionalidades
-
-Comprovadas pelo código:
-
-- App inicial do template (`src/App.jsx`) com o "Octocat" e o contador.
-- **Dev Container** pré-configurado (`.devcontainer/devcontainer.json`) para
-  abrir o projeto direto no Codespaces/VS Code.
-- Configuração de Vite (`vite.config.js`) e testes com Testing Library
-  (`src/App.test.jsx`).
-
-## Como rodar
+## Comandos
 
 ```bash
-npm install
-npm start      # servidor de desenvolvimento (Vite)
-npm test       # testes
-npm run build  # build de produção
+npm run dev       # servidor de desenvolvimento do Vite
+npm run build     # bundle de produção em dist/
+npm run preview   # prévia local do bundle
+npm run lint      # análise estática com ESLint
+npx vitest run    # executar a suíte existente uma vez
 ```
 
-## Estrutura do projeto
+O workflow de CI executa instalação limpa, lint e build. Os testes existentes são executados separadamente com `npx vitest run`.
 
-```
-.devcontainer/   # configuração do Codespaces
-.vscode/         # launch/tasks
-public/          # assets do template
-src/             # aplicação React
+## Estrutura
+
+```text
+.devcontainer/   configuração do Codespaces
+public/          ícones e imagens
+src/             interface React e configuração Vitest
+compose.yaml     prévia local da versão de produção
 ```
 
 ## Licença
 
-MIT (do template original, © GitHub) — veja [LICENSE](LICENSE).
+MIT (do template original do GitHub). Consulte [LICENSE](LICENSE).

@@ -1,14 +1,15 @@
-FROM node:20-alpine AS build
+FROM node:24-bookworm-slim AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci || npm install
+RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:20-alpine
+FROM node:24-bookworm-slim AS runtime
 WORKDIR /app
-RUN npm i -g serve
-COPY --from=build /app/dist ./dist
+RUN npm install --global serve@14.2.6 && chown node:node /app
+COPY --from=build --chown=node:node /app/dist ./dist
+USER node
 ENV PORT=3000
 EXPOSE 3000
-CMD ["sh", "-c", "serve -s dist -l $PORT"]
+CMD ["sh", "-c", "serve -s dist -l ${PORT:-3000}"]
